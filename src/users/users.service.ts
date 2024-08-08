@@ -13,16 +13,17 @@ export class UsersService {
   ) {}
 
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    return this.usersRepository.save(
+      this.usersRepository.create(createUserDto),
+    );
   }
 
   findAll() {
     return `This action returns all users`;
   }
 
-  findOne(id: string) {
-    // return `This action returns a #${id} user`;
-    return this.usersRepository.findOne({ where: { id } });
+  findOne(username: string) {
+    return this.usersRepository.findOne({ where: { username } });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

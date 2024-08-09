@@ -4,20 +4,21 @@ import { Repository } from 'typeorm';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { Article } from './entities/article.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class ArticlesService {
   constructor(
     @InjectRepository(Article)
     private articlesRepository: Repository<Article>,
-    // @InjectRepository(User)
-    // private usersRepository: Repository<User>,
   ) {}
 
   create(createArticleDto: CreateArticleDto, userId: string) {
+    const user = new User();
+    user.id = userId;
     return this.articlesRepository.save({
       ...createArticleDto,
-      user: { id: userId },
+      user: user,
     });
   }
 
@@ -29,11 +30,17 @@ export class ArticlesService {
     return this.articlesRepository.findOne({ where: { id } });
   }
 
-  update(id: number, updateArticleDto: UpdateArticleDto) {
-    return `This action updates a #${id} article`;
+  update(id: string, updateArticleDto: UpdateArticleDto, userId: string) {
+    return this.articlesRepository.update(
+      {
+        id,
+        user: { id: userId },
+      },
+      updateArticleDto,
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} article`;
+  remove(id: string, userId: string) {
+    return this.articlesRepository.delete({ id, user: { id: userId } });
   }
 }

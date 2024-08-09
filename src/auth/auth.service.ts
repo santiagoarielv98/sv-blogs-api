@@ -25,7 +25,11 @@ export class AuthService {
       access_token: await this.jwtService.signAsync(payload),
     };
   }
-  signUp(signUpDto: CreateUserDto) {
-    return this.usersService.create(signUpDto);
+  async signUp(signUpDto: CreateUserDto) {
+    const newUser = await this.usersService.create(signUpDto);
+    const payload = { sub: newUser.id, username: newUser.username };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 }

@@ -16,7 +16,7 @@ import { User } from 'src/users/entities/user.entity';
       database: process.env.DB_NAME,
       entities: [User, Article],
       synchronize: true,
-      dropSchema: true,
+      // dropSchema: true,
     }),
   ],
   controllers: [],

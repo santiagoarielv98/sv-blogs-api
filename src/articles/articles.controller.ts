@@ -15,7 +15,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { User } from 'src/user/user.decorator';
 import { JwtPayload } from 'src/auth/auth.interface';
 
-@Controller('articles')
+@Controller('api/articles')
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
 
@@ -36,12 +36,17 @@ export class ArticlesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateArticleDto: UpdateArticleDto) {
-    return this.articlesService.update(+id, updateArticleDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateArticleDto: UpdateArticleDto,
+    @User() user: JwtPayload,
+  ) {
+    return this.articlesService.update(id, updateArticleDto, user.sub);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.articlesService.remove(+id);
+  @UseGuards(AuthGuard)
+  remove(@Param('id') id: string, @User() user: JwtPayload) {
+    return this.articlesService.remove(id, user.sub);
   }
 }

@@ -2,6 +2,7 @@ import * as bcrypt from 'bcrypt';
 import { Article } from 'src/articles/entities/article.entity';
 import { Comment } from 'src/comments/entities/comment.entity';
 import { Like } from 'src/likes/entities/like.entity';
+import { JoinTable, ManyToMany } from 'typeorm';
 import {
   BeforeInsert,
   Column,
@@ -41,10 +42,11 @@ export class User {
   @OneToMany(() => Like, (like) => like.user)
   likes: Like[];
 
-  @OneToMany(() => User, (user) => user.followers)
+  @ManyToMany(() => User, (user) => user.followers)
   following: User[];
 
-  @OneToMany(() => User, (user) => user.following)
+  @ManyToMany(() => User, (user) => user.following)
+  @JoinTable()
   followers: User[];
 
   @CreateDateColumn()

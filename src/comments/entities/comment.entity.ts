@@ -36,14 +36,3 @@ export class Comment {
   @Column({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 }
-
-/* 
-CREATE TABLE comments (
-    id SERIAL PRIMARY KEY,
-    content TEXT NOT NULL,
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    article_id INT REFERENCES articles(id) ON DELETE CASCADE,
-    parent_comment_id INT REFERENCES comments(id) ON DELETE SET NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-*/

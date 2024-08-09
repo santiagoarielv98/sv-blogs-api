@@ -10,9 +10,10 @@ import { ArticlesModule } from './articles/articles.module';
 import { CommentsModule } from './comments/comments.module';
 import { LikesModule } from './likes/likes.module';
 import { TagsModule } from './tags/tags.module';
+import { SeedsModule } from './seeds/seeds.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), UsersModule, DbModule, AuthModule, ArticlesModule, CommentsModule, LikesModule, TagsModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), UsersModule, DbModule, AuthModule, ArticlesModule, CommentsModule, LikesModule, TagsModule, SeedsModule],
   controllers: [AppController],
   providers: [AppService, FileService],
 })

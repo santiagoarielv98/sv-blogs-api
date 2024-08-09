@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { Article } from 'src/articles/entities/article.entity';
 import { Comment } from 'src/comments/entities/comment.entity';
@@ -9,37 +15,17 @@ export class Like {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  userId: number;
-
-  @Column()
-  articleId: number;
-
-  @Column()
-  commentId: number;
-
   @Column({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
   @ManyToOne(() => User, (user) => user.likes)
   user: User;
 
-  @ManyToOne(() => Article, (article) => article.likes)
+  @ManyToOne(() => Article, (article) => article.likes, { nullable: true })
+  @JoinColumn()
   article: Article;
 
-  @ManyToOne(() => Comment, (comment) => comment.likes)
+  @ManyToOne(() => Comment, (comment) => comment.likes, { nullable: true })
+  @JoinColumn()
   comment: Comment;
 }
-
-/* 
-CREATE TABLE likes (
-    id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    article_id INT REFERENCES articles(id) ON DELETE CASCADE,
-    comment_id INT REFERENCES comments(id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(user_id, article_id, comment_id) -- Evitar que un usuario dé más de un like al mismo artículo o comentario
-);
-
-
-*/

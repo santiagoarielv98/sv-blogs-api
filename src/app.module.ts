@@ -7,9 +7,11 @@ import { FileService } from './file/file.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ArticlesModule } from './articles/articles.module';
+import { CommentsModule } from './comments/comments.module';
+import { LikesModule } from './likes/likes.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), UsersModule, DbModule, AuthModule, ArticlesModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), UsersModule, DbModule, AuthModule, ArticlesModule, CommentsModule, LikesModule],
   controllers: [AppController],
   providers: [AppService, FileService],
 })

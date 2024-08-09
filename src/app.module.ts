@@ -9,9 +9,10 @@ import { AuthModule } from './auth/auth.module';
 import { ArticlesModule } from './articles/articles.module';
 import { CommentsModule } from './comments/comments.module';
 import { LikesModule } from './likes/likes.module';
+import { TagsModule } from './tags/tags.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), UsersModule, DbModule, AuthModule, ArticlesModule, CommentsModule, LikesModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), UsersModule, DbModule, AuthModule, ArticlesModule, CommentsModule, LikesModule, TagsModule],
   controllers: [AppController],
   providers: [AppService, FileService],
 })

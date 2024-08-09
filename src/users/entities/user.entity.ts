@@ -41,6 +41,12 @@ export class User {
   @OneToMany(() => Like, (like) => like.user)
   likes: Like[];
 
+  @OneToMany(() => User, (user) => user.followers)
+  following: User[];
+
+  @OneToMany(() => User, (user) => user.following)
+  followers: User[];
+
   @CreateDateColumn()
   createdAt: Date;
 

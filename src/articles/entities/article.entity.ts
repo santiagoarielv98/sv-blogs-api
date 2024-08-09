@@ -9,7 +9,10 @@ import {
   UpdateDateColumn,
   ManyToOne,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
+import { Tag } from 'src/tags/entities/tag.entity';
 
 @Entity()
 export class Article {
@@ -42,6 +45,11 @@ export class Article {
 
   @OneToMany(() => Like, (like) => like.article)
   likes: Like[];
+
+  //tags
+  @ManyToMany(() => Tag, (tag) => tag.articles)
+  @JoinTable()
+  tags: Tag[];
 
   @CreateDateColumn()
   createdAt: Date;

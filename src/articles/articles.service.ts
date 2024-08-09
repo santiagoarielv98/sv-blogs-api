@@ -27,7 +27,59 @@ export class ArticlesService {
   }
 
   findOne(id: string) {
-    return this.articlesRepository.findOne({ where: { id } });
+    /*  return this.articlesRepository.findOne({
+      where: { id },
+      relations: [
+        'comments',
+        'comments.user',
+        'user',
+        'comments.parent',
+        'likes',
+      ],
+      select: {
+        user: {
+          id: true,
+          username: true,
+          avatarUrl: true,
+        },
+        comments: {
+          id: true,
+          content: true,
+          parent: {
+            id: true,
+          },
+          user: {
+            id: true,
+            username: true,
+            avatarUrl: true,
+          },
+        },
+      },
+    }); */
+    return (
+      this.articlesRepository
+        .createQueryBuilder('article')
+        .where('article.id = :id', { id })
+        .innerJoinAndSelect('article.comments', 'comment')
+        .innerJoinAndSelect('comment.user', 'commentUser')
+        .innerJoinAndSelect('article.user', 'articleUser')
+        .leftJoinAndSelect('comment.parent', 'parentComment')
+        // .leftJoinAndSelect('article.likes', 'like')
+        .loadRelationCountAndMap('article.likesCount', 'article.likes')
+        .select([
+          'article',
+          'articleUser.id',
+          'articleUser.username',
+          'articleUser.avatarUrl',
+          'comment.id',
+          'comment.content',
+          'parentComment.id',
+          'commentUser.id',
+          'commentUser.username',
+          'commentUser.avatarUrl',
+        ])
+        .getOne()
+    );
   }
 
   update(id: string, updateArticleDto: UpdateArticleDto, userId: string) {
@@ -42,5 +94,9 @@ export class ArticlesService {
 
   remove(id: string, userId: string) {
     return this.articlesRepository.delete({ id, user: { id: userId } });
+  }
+
+  findAll2() {
+    return this.articlesRepository.find({ relations: ['comments'] });
   }
 }

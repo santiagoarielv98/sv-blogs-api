@@ -13,7 +13,17 @@ import { TagsModule } from './tags/tags.module';
 import { SeedsModule } from './seeds/seeds.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), UsersModule, DbModule, AuthModule, ArticlesModule, CommentsModule, LikesModule, TagsModule, SeedsModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    UsersModule,
+    DbModule,
+    AuthModule,
+    ArticlesModule,
+    CommentsModule,
+    LikesModule,
+    TagsModule,
+    SeedsModule,
+  ],
   controllers: [AppController],
   providers: [AppService, FileService],
 })

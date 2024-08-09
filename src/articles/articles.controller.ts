@@ -30,6 +30,11 @@ export class ArticlesController {
     return this.articlesService.findAll();
   }
 
+  @Get('all')
+  findAll2() {
+    return this.articlesService.findAll2();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.articlesService.findOne(id);

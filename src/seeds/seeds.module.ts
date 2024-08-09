@@ -15,20 +15,26 @@ export class SeedsModule implements OnModuleInit {
   constructor(private readonly seedsService: SeedsService) {}
 
   async onModuleInit() {
-    const users = await this.seedsService.createUsers();
-    console.log('Users created');
-    const articles = await this.seedsService.createArticles({ users });
-    console.log('Articles created');
-    await this.seedsService.followUsers({ users });
-    console.log('Users followed');
-    const comments = await this.seedsService.createComments({
-      users,
-      articles,
-    });
-    console.log('Comments created');
-    await this.seedsService.createLikes({ users, articles, comments });
-    console.log('Likes created');
+    if ((await this.seedsService.countUsers()) === 0) {
+      const users = await this.seedsService.createUsers();
+      console.log('Users created');
+      const articles = await this.seedsService.createArticles({ users });
+      console.log('Articles created');
+      await this.seedsService.followUsers({ users });
+      console.log('Users followed');
+      const comments = await this.seedsService.createComments({
+        users,
+        articles,
+      });
+      console.log('Comments created');
+      await this.seedsService.createLikes({ users, articles, comments });
+      console.log('Likes created');
 
-    console.log('Seeds created');
+      const { article } = await this.seedsService.createUserAndArticle();
+      console.log('User and Article created');
+      console.log('Article ID:', article.id);
+
+      console.log('Seeds created');
+    }
   }
 }

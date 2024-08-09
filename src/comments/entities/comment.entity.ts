@@ -25,9 +25,9 @@ export class Comment {
   article: Article;
 
   @ManyToOne(() => Comment, (comment) => comment.replies)
-  parentComment: Comment;
+  parent: Comment;
 
-  @OneToMany(() => Comment, (comment) => comment.parentComment)
+  @OneToMany(() => Comment, (comment) => comment.parent)
   replies: Comment[];
 
   @OneToMany(() => Like, (like) => like.comment)

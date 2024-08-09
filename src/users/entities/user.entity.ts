@@ -1,9 +1,11 @@
 import * as bcrypt from 'bcrypt';
+import { Article } from 'src/articles/entities/article.entity';
 import {
   BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -19,7 +21,7 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @Column({ nullable: true })
@@ -27,6 +29,9 @@ export class User {
 
   @Column({ nullable: true })
   avatarUrl: string;
+
+  @OneToMany(() => Article, (article) => article.user)
+  articles: Article[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -1,6 +1,7 @@
 import * as bcrypt from 'bcrypt';
 import { Article } from 'src/articles/entities/article.entity';
 import { Comment } from 'src/comments/entities/comment.entity';
+import { Like } from 'src/likes/entities/like.entity';
 import {
   BeforeInsert,
   Column,
@@ -36,6 +37,9 @@ export class User {
 
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
+
+  @OneToMany(() => Like, (like) => like.user)
+  likes: Like[];
 
   @CreateDateColumn()
   createdAt: Date;

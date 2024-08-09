@@ -8,6 +8,7 @@ import {
 
 import { Article } from 'src/articles/entities/article.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Like } from '../../likes/entities/like.entity';
 
 @Entity()
 export class Comment {
@@ -28,6 +29,9 @@ export class Comment {
 
   @OneToMany(() => Comment, (comment) => comment.parentComment)
   replies: Comment[];
+
+  @OneToMany(() => Like, (like) => like.comment)
+  likes: Like[];
 
   @Column({ default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

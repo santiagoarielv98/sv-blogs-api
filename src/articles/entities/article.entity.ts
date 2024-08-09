@@ -1,5 +1,6 @@
 import { User } from 'src/users/entities/user.entity';
 import { Comment } from '../../comments/entities/comment.entity';
+import { Like } from '../../likes/entities/like.entity';
 import {
   Entity,
   Column,
@@ -38,6 +39,9 @@ export class Article {
 
   @OneToMany(() => Comment, (comment) => comment.article)
   comments: Comment[];
+
+  @OneToMany(() => Like, (like) => like.article)
+  likes: Like[];
 
   @CreateDateColumn()
   createdAt: Date;

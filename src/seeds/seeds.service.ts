@@ -10,6 +10,7 @@ import { Tag } from '../tags/entities/tag.entity';
 
 import * as USERS from 'src/mocks/USERS_MOCK_DATA.json';
 import * as ARTICLES from 'src/mocks/ARTICLES_MOCK_DATA.json';
+import * as COMMENTS from 'src/mocks/COMMENTS_MOCK_DATA.json';
 
 @Injectable()
 export class SeedsService {
@@ -54,7 +55,7 @@ export class SeedsService {
     const comments = articles.map((article) => ({
       article,
       user: users[Math.floor(Math.random() * users.length)],
-      content: 'This is a comment',
+      content: COMMENTS[Math.floor(Math.random() * COMMENTS.length)].content,
     }));
     return await this.commentsRepository.save(comments);
   }

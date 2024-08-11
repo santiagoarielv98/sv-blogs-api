@@ -27,35 +27,6 @@ export class ArticlesService {
   }
 
   findOne(id: string) {
-    /*  return this.articlesRepository.findOne({
-      where: { id },
-      relations: [
-        'comments',
-        'comments.user',
-        'user',
-        'comments.parent',
-        'likes',
-      ],
-      select: {
-        user: {
-          id: true,
-          username: true,
-          avatarUrl: true,
-        },
-        comments: {
-          id: true,
-          content: true,
-          parent: {
-            id: true,
-          },
-          user: {
-            id: true,
-            username: true,
-            avatarUrl: true,
-          },
-        },
-      },
-    }); */
     return (
       this.articlesRepository
         .createQueryBuilder('article')

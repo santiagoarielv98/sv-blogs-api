@@ -7,8 +7,6 @@ import {
   Post,
   Request,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AuthGuard } from './auth.guard';
@@ -27,7 +25,6 @@ export class AuthController {
   // register
   @HttpCode(HttpStatus.CREATED)
   @Post('register')
-  @UsePipes(new ValidationPipe({ transform: true }))
   signUp(@Body() signUpDto: CreateUserDto) {
     return this.authService.signUp(signUpDto);
   }

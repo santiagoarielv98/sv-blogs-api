@@ -6,10 +6,7 @@ import { ContextIdFactory, ModuleRef } from '@nestjs/core';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private authService: AuthService,
-    private moduleRef: ModuleRef,
-  ) {
+  constructor(private moduleRef: ModuleRef) {
     super({
       passReqToCallback: true,
     });

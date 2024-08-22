@@ -10,7 +10,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     private authService: AuthService,
     private moduleRef: ModuleRef,
   ) {
-    console.log('LocalStrategy');
     super({
       passReqToCallback: true,
     });
@@ -21,11 +20,9 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     username: string,
     password: string,
   ): Promise<any> {
-    console.log('validate');
     const contextId = ContextIdFactory.getByRequest(request);
     const authService = await this.moduleRef.resolve(AuthService, contextId);
     const user = await authService.validateUser(username, password);
-    console.log(user);
     if (!user) {
       throw new UnauthorizedException();
     }

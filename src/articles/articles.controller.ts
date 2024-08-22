@@ -12,7 +12,7 @@ import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { User } from 'src/user/user.decorator';
+import { User } from 'src/users/decorators/user.decorator';
 import { JwtPayload } from 'src/auth/auth.interface';
 
 @Controller('api/articles')

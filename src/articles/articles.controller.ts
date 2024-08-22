@@ -11,7 +11,7 @@ import {
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { User } from 'src/users/decorators/user.decorator';
 import { JwtPayload } from 'src/auth/auth.interface';
 

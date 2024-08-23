@@ -1,9 +1,11 @@
 import * as bcrypt from 'bcrypt';
+import { Post } from 'src/posts/entities/post.entity';
 import {
   BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -33,6 +35,10 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  // RELATIONS
+  @OneToMany(() => Post, (post) => post.user)
+  posts: Post[];
 
   @BeforeInsert()
   async hashPassword() {

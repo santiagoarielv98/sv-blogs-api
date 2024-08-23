@@ -1,6 +1,7 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
@@ -24,8 +25,10 @@ export class CreateUserDto {
   password: string;
 
   @IsString()
+  @IsOptional()
   bio: string;
 
   @IsString()
+  @IsOptional()
   avatarUrl: string;
 }

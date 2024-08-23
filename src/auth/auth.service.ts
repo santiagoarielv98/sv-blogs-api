@@ -16,7 +16,9 @@ export class AuthService {
     const newUser = await this.usersService.create(signUpDto);
     const payload = { sub: newUser.id, username: newUser.username };
     return {
-      token: await this.jwtService.signAsync(payload),
+      token: await this.jwtService.signAsync(payload, {
+        secret: process.env.JWT_SECRET,
+      }),
       email: newUser.email,
     };
   }
@@ -39,7 +41,9 @@ export class AuthService {
   async login(user: any) {
     const payload = { sub: user.id, username: user.username };
     return {
-      token: await this.jwtService.signAsync(payload),
+      token: await this.jwtService.signAsync(payload, {
+        secret: process.env.JWT_SECRET,
+      }),
       email: user.email,
     };
   }

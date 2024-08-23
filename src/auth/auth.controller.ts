@@ -22,7 +22,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  signIn(@Request() req) {
+  signIn(@Request() req: Request) {
     return this.authService.login(req.user);
   }
 

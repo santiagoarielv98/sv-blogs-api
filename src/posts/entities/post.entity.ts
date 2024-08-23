@@ -19,13 +19,13 @@ export class Post {
   @Column()
   content: string;
 
-  @Column()
+  @Column({ default: false })
   published: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   publishedAt: Date;
 
-  @Column()
+  @Column({ unique: true })
   slug: string;
 
   // TIMESTAMP COLUMNS

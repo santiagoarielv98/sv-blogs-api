@@ -4,7 +4,7 @@ import { PostsService } from './posts.service';
 import { Public } from 'src/auth/decorators/auth.decorator';
 import { User } from 'src/users/decorators/user.decorator';
 
-@Controller('posts')
+@Controller('api/posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 

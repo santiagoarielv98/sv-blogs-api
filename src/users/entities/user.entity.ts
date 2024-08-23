@@ -1,14 +1,9 @@
 import * as bcrypt from 'bcrypt';
-import { Article } from 'src/articles/entities/article.entity';
-import { Comment } from 'src/comments/entities/comment.entity';
-import { Like } from 'src/likes/entities/like.entity';
-import { JoinTable, ManyToMany } from 'typeorm';
 import {
   BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -32,22 +27,6 @@ export class User {
 
   @Column({ nullable: true })
   avatarUrl: string;
-
-  @OneToMany(() => Article, (article) => article.user)
-  articles: Article[];
-
-  @OneToMany(() => Comment, (comment) => comment.user)
-  comments: Comment[];
-
-  @OneToMany(() => Like, (like) => like.user)
-  likes: Like[];
-
-  @ManyToMany(() => User, (user) => user.followers)
-  following: User[];
-
-  @ManyToMany(() => User, (user) => user.following)
-  @JoinTable()
-  followers: User[];
 
   @CreateDateColumn()
   createdAt: Date;

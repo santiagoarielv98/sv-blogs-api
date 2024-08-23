@@ -23,7 +23,9 @@ export class CreateUserDto {
   @MaxLength(20)
   password: string;
 
+  @IsString()
   bio: string;
 
+  @IsString()
   avatarUrl: string;
 }

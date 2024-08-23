@@ -13,6 +13,7 @@ import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Public } from './decorators/auth.decorator';
+import { User } from 'src/users/decorators/user.decorator';
 
 @Controller('api/auth')
 export class AuthController {
@@ -22,8 +23,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  signIn(@Request() req: Request) {
-    return this.authService.login(req.user);
+  signIn(@User() user: any) {
+    return this.authService.login(user);
   }
 
   @Public()

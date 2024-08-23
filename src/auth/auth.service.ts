@@ -15,7 +15,8 @@ export class AuthService {
     const newUser = await this.usersService.create(signUpDto);
     const payload = { sub: newUser.id, username: newUser.username };
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      token: await this.jwtService.signAsync(payload),
+      email: newUser.email,
     };
   }
 
@@ -30,13 +31,10 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = {
-      username: user.username,
-      sub: user.id,
-      email: user.email,
-    };
+    const payload = { sub: user.id, username: user.username };
     return {
-      access_token: this.jwtService.sign(payload),
+      token: await this.jwtService.signAsync(payload),
+      email: user.email,
     };
   }
 }

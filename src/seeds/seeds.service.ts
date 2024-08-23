@@ -17,7 +17,6 @@ export class SeedsService implements OnModuleInit {
       avatarUrl: null,
       bio: null,
     });
-    console.log('Seeds created');
 
     const _post = await this.postsService.create(
       {
@@ -25,16 +24,17 @@ export class SeedsService implements OnModuleInit {
         content: 'This is a demo post',
         published: true,
       },
-      user.username,
+      user.id,
     );
 
     const _postClone = await this.postsService.create(
       {
         title: 'Demo Post',
-        content: 'This is a demo post',
+        content: 'This is a demo post clone',
         published: true,
       },
-      user.username,
+      user.id,
     );
+    console.log('Seeds created');
   }
 }

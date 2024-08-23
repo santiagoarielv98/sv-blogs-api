@@ -17,15 +17,16 @@ export class PostsService {
     return this.postsRepository.findOne({ where: { slug } });
   }
   async create(createPostDto: CreatePostDto, user: string) {
-    const userEntity = await this.usersService.findOneByUsername(user);
+    const userEntity = await this.usersService.findOneById(user);
 
     if (!userEntity) {
       throw new Error('User not found');
     }
-
     const post = this.postsRepository.create(createPostDto);
 
-    post.slug = slugify(post.title, { lower: true, replacement: '-' });
+    const slug = await this.uniqueSlug(post.title);
+
+    post.slug = slug;
     post.user = userEntity;
 
     return this.postsRepository.save(post);
@@ -34,4 +35,16 @@ export class PostsService {
   findAll() {
     return this.postsRepository.find();
   }
+
+  uniqueSlug = async (title: string) => {
+    let slug = slugify(title, { lower: true });
+    let counter = 1;
+
+    while (await this.findOneBySlug(slug)) {
+      slug = slugify(`${title}-${counter}`, { lower: true });
+      counter++;
+    }
+
+    return slug;
+  };
 }

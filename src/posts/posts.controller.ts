@@ -1,16 +1,17 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { CreatePostDto } from './dto/create-post.dto';
-import { PostsService } from './posts.service';
+import { AuthUser } from 'src/auth/auth.interface';
 import { Public } from 'src/auth/decorators/auth.decorator';
 import { User } from 'src/users/decorators/user.decorator';
+import { CreatePostDto } from './dto/create-post.dto';
+import { PostsService } from './posts.service';
 
 @Controller('api/posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
-  create(@Body() createPostDto: CreatePostDto, @User() user: any) {
-    return this.postsService.create(createPostDto, user);
+  create(@Body() createPostDto: CreatePostDto, @User() user: AuthUser) {
+    return this.postsService.create(createPostDto, user.userId);
   }
 
   @Get()

@@ -1,11 +1,9 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
-import { useRequestLogging } from './middlewares/request-logging';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  useRequestLogging(app);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { AuthUser } from 'src/auth/auth.interface';
 import { Public } from 'src/auth/decorators/auth.decorator';
 import { User } from 'src/users/decorators/user.decorator';
@@ -24,5 +24,10 @@ export class PostsController {
   @Public()
   findOneBySlug(@Param('slug') slug: string) {
     return this.postsService.findOneBySlug(slug);
+  }
+
+  @Delete(':id')
+  delete(@Param('id') id: string, @User() user: AuthUser) {
+    return this.postsService.delete(id, user.userId);
   }
 }

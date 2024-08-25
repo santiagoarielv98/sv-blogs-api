@@ -14,7 +14,10 @@ export class PostsService {
   ) {}
 
   findOneBySlug(slug: string) {
-    return this.postsRepository.findOne({ where: { slug } });
+    return this.postsRepository.findOne({
+      where: { slug },
+      relations: ['user'],
+    });
   }
   async create(createPostDto: CreatePostDto, user: string) {
     const userEntity = await this.usersService.findOneById(user);
@@ -34,6 +37,15 @@ export class PostsService {
 
   findAll() {
     return this.postsRepository.find();
+  }
+
+  delete(id: string, userId: string) {
+    return this.postsRepository.delete({
+      id,
+      user: {
+        id: userId,
+      },
+    });
   }
 
   uniqueSlug = async (title: string) => {

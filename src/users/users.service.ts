@@ -18,14 +18,23 @@ export class UsersService {
   }
 
   findOneByUsername(username: string) {
-    return this.usersRepository.findOne({ where: { username } });
+    return this.usersRepository.findOne({
+      where: { username },
+      select: ['id', 'username', 'email', 'password'],
+    });
   }
 
   findOneByEmail(email: string) {
-    return this.usersRepository.findOne({ where: { email } });
+    return this.usersRepository.findOne({
+      where: { email },
+      select: ['id', 'username', 'email', 'password'],
+    });
   }
 
   findOneById(id: string) {
-    return this.usersRepository.findOne({ where: { id } });
+    return this.usersRepository.findOne({
+      where: { id },
+      select: ['id', 'username', 'email', 'password'],
+    });
   }
 }

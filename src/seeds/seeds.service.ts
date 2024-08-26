@@ -18,6 +18,14 @@ export class SeedsService implements OnModuleInit {
       bio: null,
     });
 
+    const user2 = await this.usersService.create({
+      password: '12345678',
+      email: 'test@sv-tech.dev',
+      username: 'test',
+      avatarUrl: null,
+      bio: null,
+    });
+
     const _post = await this.postsService.create(
       {
         title: 'Demo Post',
@@ -35,6 +43,14 @@ export class SeedsService implements OnModuleInit {
       },
       user.id,
     );
-    console.log('Seeds created');
+
+    await this.postsService.create(
+      {
+        title: 'Test Post',
+        content: 'This is a test post',
+        published: true,
+      },
+      user2.id,
+    );
   }
 }

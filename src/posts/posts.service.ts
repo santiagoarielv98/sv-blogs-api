@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import type { CreatePostDto } from './dto/create-post.dto';
@@ -23,7 +23,7 @@ export class PostsService {
     const userEntity = await this.usersService.findOneById(user);
 
     if (!userEntity) {
-      throw new Error('User not found');
+      throw new UnauthorizedException();
     }
     const post = this.postsRepository.create(createPostDto);
 

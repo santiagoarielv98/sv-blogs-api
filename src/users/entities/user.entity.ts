@@ -1,4 +1,8 @@
+import { Article } from 'src/articles/entities/article.entity';
+import { CommentReaction } from 'src/comment-reactions/entities/comment-reaction.entity';
+import { Comment } from 'src/comments/entities/comment.entity';
 import { Follower } from 'src/followers/entities/follower.entity';
+import { Reaction } from 'src/reactions/entities/reaction.entity';
 import {
   Column,
   CreateDateColumn,
@@ -34,11 +38,23 @@ export class User {
   @UpdateDateColumn()
   updated_at: Date;
 
-  // RELATIONSHIPS
+  // Relaciones
 
   @OneToMany(() => Follower, (follower) => follower.follower)
   followers: Follower[];
 
   @OneToMany(() => Follower, (follower) => follower.following)
   following: Follower[];
+
+  @OneToMany(() => Article, (article) => article.user)
+  articles: Article[];
+
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[];
+
+  @OneToMany(() => Reaction, (reaction) => reaction.user)
+  reactions: Reaction[];
+
+  @OneToMany(() => CommentReaction, (comment_reaction) => comment_reaction.user)
+  comment_reactions: CommentReaction[];
 }

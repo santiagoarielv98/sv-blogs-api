@@ -6,6 +6,11 @@ import { DATABASE_CONFIG } from './config/constants';
 import { AuthModule } from './auth/auth.module';
 import databaseConfig from './config/database.config';
 import { UsersModule } from './users/users.module';
+import { CommentsModule } from './comments/comments.module';
+import { ReactionsModule } from './reactions/reactions.module';
+import { TagsModule } from './tags/tags.module';
+import { ArticleTagsModule } from './article-tags/article-tags.module';
+import { CommentReactionsModule } from './comment-reactions/comment-reactions.module';
 
 @Module({
   imports: [
@@ -20,6 +25,11 @@ import { UsersModule } from './users/users.module';
     ArticlesModule,
     UsersModule,
     AuthModule,
+    CommentsModule,
+    ReactionsModule,
+    TagsModule,
+    ArticleTagsModule,
+    CommentReactionsModule,
   ],
   controllers: [],
   providers: [],

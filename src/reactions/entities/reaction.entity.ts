@@ -1,4 +1,5 @@
 import { Article } from 'src/articles/entities/article.entity';
+import { CommentReactionType } from 'src/config/constants';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -6,25 +7,29 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 
 @Entity()
+@Unique(['article', 'user'])
 export class Reaction {
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
+
+  @Column({
+    type: 'enum',
+    enum: CommentReactionType,
+  })
+  type: CommentReactionType;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  // Relaciones
 
   @ManyToOne(() => Article, (article) => article.reactions)
   article: Article;
 
   @ManyToOne(() => User, (user) => user.reactions)
   user: User;
-
-  @Column({
-    type: 'enum',
-    enum: ['like', 'dislike', 'love', 'funny', 'angry'],
-  })
-  type: 'like' | 'dislike' | 'love' | 'funny' | 'angry';
-
-  @CreateDateColumn()
-  created_at: Date;
 }

@@ -14,6 +14,11 @@ export class Follower {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @CreateDateColumn()
+  created_at: Date;
+
+  // Relaciones
+
   @ManyToOne(() => User, (user) => user.followers, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'follower_id' })
   follower: User;
@@ -21,7 +26,4 @@ export class Follower {
   @ManyToOne(() => User, (user) => user.following, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'following_id' })
   following: User;
-
-  @CreateDateColumn()
-  created_at: Date;
 }

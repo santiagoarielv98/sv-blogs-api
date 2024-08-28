@@ -13,7 +13,15 @@ import {
 @Entity()
 export class Comment {
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
+
+  @Column()
+  content: string;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  // Relaciones
 
   @ManyToOne(() => Article, (article) => article.comments)
   article: Article;
@@ -21,17 +29,11 @@ export class Comment {
   @ManyToOne(() => User, (user) => user.comments)
   user: User;
 
-  @Column()
-  content: string;
-
   @ManyToOne(() => Comment, (comment) => comment.replies)
-  parent_comment: Comment;
+  parent: Comment;
 
-  @OneToMany(() => Comment, (comment) => comment.parent_comment)
+  @OneToMany(() => Comment, (comment) => comment.parent)
   replies: Comment[];
-
-  @CreateDateColumn()
-  created_at: Date;
 
   @OneToMany(() => CommentReaction, (reaction) => reaction.comment)
   reactions: CommentReaction[];

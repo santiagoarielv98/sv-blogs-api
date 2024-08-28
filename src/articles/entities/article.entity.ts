@@ -15,13 +15,16 @@ import {
 @Entity()
 export class Article {
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
 
   @Column()
   title: string;
 
   @Column()
   content: string;
+
+  @Column()
+  summary: string;
 
   @CreateDateColumn()
   created_at: Date;
@@ -39,9 +42,6 @@ export class Article {
 
   @OneToMany(() => Reaction, (reaction) => reaction.article)
   reactions: Reaction[];
-
-  @Column({ nullable: true })
-  summary: string;
 
   @OneToMany(() => ArticleTag, (article_tag) => article_tag.article)
   tags: ArticleTag[];

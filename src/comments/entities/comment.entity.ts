@@ -23,10 +23,10 @@ export class Comment {
 
   // Relaciones
 
-  @ManyToOne(() => Article, (article) => article.comments)
+  @ManyToOne(() => Article, (article) => article.comments, { nullable: false })
   article: Article;
 
-  @ManyToOne(() => User, (user) => user.comments)
+  @ManyToOne(() => User, (user) => user.comments, { nullable: false })
   user: User;
 
   @ManyToOne(() => Comment, (comment) => comment.replies)

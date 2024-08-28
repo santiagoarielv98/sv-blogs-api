@@ -17,14 +17,26 @@ export class Article {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ nullable: true })
   title: string;
 
-  @Column()
+  @Column({ nullable: true })
   content: string;
 
-  @Column()
+  @Column({ nullable: true })
   summary: string;
+
+  @Column({ default: false })
+  published: boolean;
+
+  @Column({ nullable: true })
+  published_at: Date;
+
+  @Column({ nullable: true })
+  thumbnail: string;
+
+  @Column({ unique: true, nullable: true })
+  slug: string;
 
   @CreateDateColumn()
   created_at: Date;
@@ -34,7 +46,7 @@ export class Article {
 
   // Relaciones
 
-  @ManyToOne(() => User, (user) => user.articles)
+  @ManyToOne(() => User, (user) => user.articles, { nullable: false })
   user: User;
 
   @OneToMany(() => Comment, (comment) => comment.article)

@@ -10,9 +10,15 @@ export class ArticleTag {
 
   // Relaciones
 
-  @ManyToOne(() => Article, (article) => article.tags)
+  @ManyToOne(() => Article, (article) => article.tags, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   article: Article;
 
-  @ManyToOne(() => Tag, (tag) => tag.articles)
+  @ManyToOne(() => Tag, (tag) => tag.articles, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   tag: Tag;
 }

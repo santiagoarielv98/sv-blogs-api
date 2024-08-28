@@ -27,9 +27,9 @@ export class Reaction {
 
   // Relaciones
 
-  @ManyToOne(() => Article, (article) => article.reactions)
+  @ManyToOne(() => Article, (article) => article.reactions, { nullable: false })
   article: Article;
 
-  @ManyToOne(() => User, (user) => user.reactions)
+  @ManyToOne(() => User, (user) => user.reactions, { nullable: false })
   user: User;
 }

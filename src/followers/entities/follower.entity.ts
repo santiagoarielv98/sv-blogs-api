@@ -1,3 +1,4 @@
+import { User } from 'src/users/entities/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -6,7 +7,6 @@ import {
   CreateDateColumn,
   Unique,
 } from 'typeorm';
-import { User } from './user.entity';
 
 @Entity()
 @Unique(['follower', 'following'])

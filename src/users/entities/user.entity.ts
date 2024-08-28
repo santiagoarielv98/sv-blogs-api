@@ -1,3 +1,4 @@
+import { Follower } from 'src/followers/entities/follower.entity';
 import {
   Column,
   CreateDateColumn,
@@ -6,7 +7,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Follower } from './follower.entity';
 
 @Entity()
 export class User {

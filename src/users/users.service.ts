@@ -1,14 +1,15 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { Follower } from './entities/follower.entity';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -20,34 +21,42 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const isUserExist = await this.usersRepository.findOne({
+    // verificar si el email no está en uso
+    const emailExists = await this.usersRepository.findOne({
       where: { email: createUserDto.email },
     });
-    if (isUserExist) {
-      throw new BadRequestException('Email already exists');
+    if (emailExists) {
+      throw new ConflictException('Email already in use');
     }
-    const isUsernameExist = await this.usersRepository.findOne({
+
+    // verificar si el nombre de usuario no está en uso
+    const usernameExists = await this.usersRepository.findOne({
       where: { username: createUserDto.username },
     });
-    if (isUsernameExist) {
-      throw new BadRequestException('Username already exists');
+    if (usernameExists) {
+      throw new ConflictException('Username already in use');
     }
 
+    // crear el usuario
     const newUser = this.usersRepository.create(createUserDto);
-    return await this.usersRepository.save(newUser);
-  }
-
-  findAll() {
-    return this.usersRepository.find();
+    return this.usersRepository.save(newUser);
   }
 
   findOne(id: string) {
-    // buscar y contar los seguidores
     return this.usersRepository
       .createQueryBuilder('user')
       .loadRelationCountAndMap('user.followers', 'user.followers')
       .loadRelationCountAndMap('user.following', 'user.following')
       .where('user.id = :id', { id })
+      .select([
+        'user.id',
+        'user.username',
+        'user.email',
+        'user.bio',
+        'user.profile_picture',
+        'user.followers',
+        'user.following',
+      ])
       .getOne();
   }
 
@@ -56,22 +65,22 @@ export class UsersService {
   }
 
   async follow(followerId: string, followingId: string) {
+    // verificar si el usuario no se está siguiendo a sí mismo
     if (followerId === followingId) {
       throw new BadRequestException('You cannot follow yourself');
     }
-
+    // verificar que existan los usuarios
     const follower = await this.usersRepository.findOne({
       where: { id: followerId },
     });
     const following = await this.usersRepository.findOne({
       where: { id: followingId },
     });
-
     if (!follower || !following) {
       throw new NotFoundException('User not found');
     }
-
-    const isFollowing = await this.followersRepository.findOne({
+    // verificar si ya se está siguiendo
+    const followExists = await this.followersRepository.findOne({
       where: {
         follower: {
           id: followerId,
@@ -81,21 +90,34 @@ export class UsersService {
         },
       },
     });
-
-    if (isFollowing) {
-      throw new BadRequestException('You are already following this user');
+    if (followExists) {
+      throw new ConflictException('You are already following this user');
     }
-
-    const newFollower = this.followersRepository.create({
+    // seguir al usuario
+    const newFollow = this.followersRepository.create({
       follower,
       following,
     });
-
-    return this.followersRepository.save(newFollower);
+    return this.followersRepository.save(newFollow);
   }
 
   async unfollow(followerId: string, followingId: string) {
-    const follower = await this.followersRepository.findOne({
+    // verificar si el usuario no se está dejando de seguir a sí mismo
+    if (followerId === followingId) {
+      throw new BadRequestException('You cannot unfollow yourself');
+    }
+    // verificar que existan los usuarios
+    const follower = await this.usersRepository.findOne({
+      where: { id: followerId },
+    });
+    const following = await this.usersRepository.findOne({
+      where: { id: followingId },
+    });
+    if (!follower || !following) {
+      throw new NotFoundException('User not found');
+    }
+    // verificar si se está siguiendo
+    const followExists = await this.followersRepository.findOne({
       where: {
         follower: {
           id: followerId,
@@ -105,23 +127,28 @@ export class UsersService {
         },
       },
     });
-
-    if (!follower) {
-      throw new BadRequestException('You are not following this user');
+    if (!followExists) {
+      throw new ConflictException('You are not following this user');
     }
-
-    return this.followersRepository.remove(follower);
+    // dejar de seguir al usuario
+    return this.followersRepository.remove(followExists);
   }
 
   findOneByUsername(username: string) {
-    return this.usersRepository.findOne({ where: { username } });
-  }
-
-  async removeByEmail(email: string) {
-    const user = await this.usersRepository.findOne({ where: { email } });
-    if (!user) {
-      throw new BadRequestException('User not found');
-    }
-    return this.usersRepository.remove(user);
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .loadRelationCountAndMap('user.followers', 'user.followers')
+      .loadRelationCountAndMap('user.following', 'user.following')
+      .where('user.username = :username', { username })
+      .select([
+        'user.id',
+        'user.username',
+        'user.email',
+        'user.bio',
+        'user.profile_picture',
+        'user.followers',
+        'user.following',
+      ])
+      .getOne();
   }
 }

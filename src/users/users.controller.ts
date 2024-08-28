@@ -10,10 +10,14 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { FollowersService } from 'src/followers/followers.service';
 
 @Controller('api/users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly followersService: FollowersService,
+  ) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -45,13 +49,13 @@ export class UsersController {
   follow(@Param('username') _username: string) {
     const followerId = '1';
     const followingId = '2';
-    return this.usersService.follow(followerId, followingId);
+    return this.followersService.follow(followerId, followingId);
   }
 
   @Delete(':username/unfollow')
   unfollow(@Param('username') _username: string) {
     const followerId = '1';
     const followingId = '2';
-    return this.usersService.unfollow(followerId, followingId);
+    return this.followersService.unfollow(followerId, followingId);
   }
 }

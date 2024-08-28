@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ArticlesModule } from './articles/articles.module';
 import { DATABASE_CONFIG } from './config/constants';
 import databaseConfig from './config/database.config';
 
@@ -14,7 +15,9 @@ import databaseConfig from './config/database.config';
       useFactory: (configService) => configService.get(DATABASE_CONFIG),
       inject: [ConfigService],
     }),
+    ArticlesModule,
   ],
   controllers: [],
+  providers: [],
 })
 export class AppModule {}

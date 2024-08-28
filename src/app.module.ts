@@ -1,19 +1,20 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { AuthModule } from './auth/auth.module';
-import { DbModule } from './db/db.module';
-import { PostsModule } from './posts/posts.module';
-import { SeedsService } from './seeds/seeds.service';
-import { UsersModule } from './users/users.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { DATABASE_CONFIG } from './config/constants';
+import databaseConfig from './config/database.config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    UsersModule,
-    DbModule,
-    AuthModule,
-    PostsModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [databaseConfig],
+    }),
+    TypeOrmModule.forRootAsync({
+      useFactory: (configService) => configService.get(DATABASE_CONFIG),
+      inject: [ConfigService],
+    }),
   ],
-  providers: [SeedsService],
+  controllers: [],
 })
 export class AppModule {}

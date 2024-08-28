@@ -1,7 +1,5 @@
-import * as bcrypt from 'bcrypt';
-import { Post } from 'src/posts/entities/post.entity';
+import { Article } from 'src/articles/entities/article.entity';
 import {
-  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -9,40 +7,50 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Follower } from './follower.entity';
+import { ArticleLike } from 'src/articles/entities/article-likes.entity';
+import { ArticleComment } from 'src/comments/entities/article-comments.entity';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: false })
   username: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: false })
   email: string;
 
   @Column({ select: false })
   password: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, length: 1000 })
   bio: string;
 
   @Column({ nullable: true })
-  avatarUrl: string;
+  profile_picture: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updated_at: Date;
 
-  // RELATIONS
-  @OneToMany(() => Post, (post) => post.user)
-  posts: Post[];
+  // RELATIONSHIPS
 
-  @BeforeInsert()
-  async hashPassword() {
-    const salt = await bcrypt.genSalt();
-    this.password = await bcrypt.hash(this.password, salt);
-  }
+  @OneToMany(() => Article, (article) => article.author)
+  articles: Article[];
+
+  @OneToMany(() => Follower, (follower) => follower.follower)
+  followers: Follower[];
+
+  @OneToMany(() => Follower, (follower) => follower.following)
+  following: Follower[];
+
+  @OneToMany(() => ArticleLike, (like) => like.user)
+  likes: ArticleLike[];
+
+  @OneToMany(() => ArticleComment, (comment) => comment.user)
+  comments: ArticleComment[];
 }

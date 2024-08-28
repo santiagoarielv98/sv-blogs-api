@@ -1,5 +1,6 @@
 import { ArticleTag } from 'src/article-tags/entities/article-tag.entity';
 import { Comment } from 'src/comments/entities/comment.entity';
+import { ArticleStatus } from 'src/config/constants';
 import { Reaction } from 'src/reactions/entities/reaction.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
@@ -26,11 +27,8 @@ export class Article {
   @Column({ nullable: true })
   summary: string;
 
-  @Column({ default: false })
-  published: boolean;
-
-  @Column({ nullable: true })
-  published_at: Date;
+  @Column({ type: 'enum', enum: ArticleStatus, default: ArticleStatus.DRAFT })
+  status: ArticleStatus;
 
   @Column({ nullable: true })
   thumbnail: string;
@@ -47,7 +45,7 @@ export class Article {
   // Relaciones
 
   @ManyToOne(() => User, (user) => user.articles, { nullable: false })
-  user: User;
+  author: User;
 
   @OneToMany(() => Comment, (comment) => comment.article)
   comments: Comment[];

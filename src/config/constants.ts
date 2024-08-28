@@ -7,3 +7,15 @@ export enum CommentReactionType {
   FUNNY = 'funny',
   ANGRY = 'angry',
 }
+
+export enum ArticleStatus {
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+  ARCHIVED = 'archived',
+}
+
+export const USERCREDENTIALS = {
+  username: 'demo',
+  email: 'demo@sv-tech.dev',
+  password: '123456',
+};

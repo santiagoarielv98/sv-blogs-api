@@ -15,7 +15,7 @@ import * as ARTICLE_MOCK_DATA from './mocks/ARTICLE_MOCK_DATA.json';
 import * as COMMENT_MOCK_DATA from './mocks/COMMENT_MOCK_DATA.json';
 import * as REPLIES_MOCK_DATA from './mocks/REPLIES_MOCK_DATA.json';
 import { Tag } from 'src/tags/entities/tag.entity';
-import { CommentReactionType } from 'src/config/constants';
+import { ArticleStatus, CommentReactionType } from 'src/config/constants';
 
 @Injectable()
 export class SeedsService implements OnApplicationBootstrap {
@@ -66,7 +66,7 @@ export class SeedsService implements OnApplicationBootstrap {
       ARTICLE_MOCK_DATA.map((article) => ({
         ...article,
         published: true,
-        user: users[Math.floor(Math.random() * users.length)],
+        author: users[Math.floor(Math.random() * users.length)],
       })),
     );
     console.log('Created articles');
@@ -74,6 +74,7 @@ export class SeedsService implements OnApplicationBootstrap {
     const _articleTags = await this.articleTagRepository.save(
       articles.map((article) => ({
         article,
+        status: ArticleStatus.PUBLISHED,
         tag: tags[Math.floor(Math.random() * tags.length)],
       })),
     );

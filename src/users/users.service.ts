@@ -1,10 +1,10 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Follower } from 'src/followers/entities/follower.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { Follower } from 'src/followers/entities/follower.entity';
 
 @Injectable()
 export class UsersService {
@@ -49,8 +49,6 @@ export class UsersService {
         'user.email',
         'user.bio',
         'user.profile_picture',
-        'user.followers',
-        'user.following',
       ])
       .getOne();
   }
@@ -71,8 +69,6 @@ export class UsersService {
         'user.email',
         'user.bio',
         'user.profile_picture',
-        'user.followers',
-        'user.following',
       ])
       .getOne();
   }

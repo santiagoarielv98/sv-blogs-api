@@ -1,34 +1,38 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Param, Post } from '@nestjs/common';
+import { USERCREDENTIALS } from 'src/config/constants';
+import { UsersService } from 'src/users/users.service';
 import { ArticlesService } from './articles.service';
-import { CreateArticleDto } from './dto/create-article.dto';
-import { UpdateArticleDto } from './dto/update-article.dto';
-
-@Controller('articles')
+import { DraftArticleDto } from './dto/draft-article.dto';
+import { PublishArticleDto } from './dto/publish-article.dto';
+@Controller('api/articles')
 export class ArticlesController {
-  constructor(private readonly articlesService: ArticlesService) {}
+  constructor(
+    private readonly articlesService: ArticlesService,
+    private readonly usersService: UsersService,
+  ) {}
 
-  @Post()
-  create(@Body() createArticleDto: CreateArticleDto) {
-    return this.articlesService.create(createArticleDto);
+  @Post('draft')
+  async draft(@Body() draftArticleDto: DraftArticleDto) {
+    const user = await this.usersService.findOneByUsername(
+      USERCREDENTIALS.username,
+    );
+    return this.articlesService.draft(draftArticleDto, user);
   }
 
-  @Get()
-  findAll() {
-    return this.articlesService.findAll();
+  @Post('publish')
+  async createAndPublish(@Body() publishArticleDto: PublishArticleDto) {
+    const user = await this.usersService.findOneByUsername(
+      USERCREDENTIALS.username,
+    );
+    return this.articlesService.createAndPublish(publishArticleDto, user);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.articlesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateArticleDto: UpdateArticleDto) {
-    return this.articlesService.update(+id, updateArticleDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.articlesService.remove(+id);
+  // publicar un articulo ya creado
+  @Post('publish/:id')
+  async publish(@Param('id') id: string) {
+    const user = await this.usersService.findOneByUsername(
+      USERCREDENTIALS.username,
+    );
+    return this.articlesService.publish(id, user);
   }
 }

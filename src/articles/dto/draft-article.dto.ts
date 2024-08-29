@@ -1,4 +1,4 @@
-import { IsArray, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class DraftArticleDto {
   @IsOptional()
@@ -8,8 +8,4 @@ export class DraftArticleDto {
   @IsOptional()
   @IsString()
   content: string;
-
-  @IsOptional()
-  @IsArray()
-  tags: string[];
 }

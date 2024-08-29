@@ -72,6 +72,38 @@ export class ArticlesService {
     return this.articleRepository.save(newArticle);
   }
 
+  // TODO: implementar la actualización de un articulo
+  async update(id: string, draftArticleDto: DraftArticleDto, user: User) {
+    const article = await this.articleRepository.findOne({
+      where: { author: user, id },
+    });
+
+    const updatedArticle = { ...article, ...draftArticleDto };
+
+    if (!article) {
+      throw new Exceptions.NotFoundException('Article not found');
+    }
+
+    if (article.status === ArticleStatus.PUBLISHED) {
+      try {
+        await validateOrReject(this.toPublishArticleDto(updatedArticle), {
+          skipMissingProperties: true,
+        });
+      } catch (errors) {
+        throw new Exceptions.BadRequestException(errors);
+      }
+      if (draftArticleDto.title && draftArticleDto.title !== article.title) {
+        article.slug = await this.slugService.generateUniqueSlug(
+          draftArticleDto.title,
+        );
+      }
+    }
+    article.title = updatedArticle.title;
+    article.content = updatedArticle.content;
+
+    return this.articleRepository.save(article);
+  }
+
   public toPublishArticleDto(article: Article): PublishArticleDto {
     const publishArticleDto = new PublishArticleDto();
     publishArticleDto.title = article.title;
@@ -91,8 +123,5 @@ export class ArticlesService {
     newArticle.author = user;
 
     return newArticle;
-  }
-  update(id: string, draftArticleDto: DraftArticleDto, user: User) {
-    throw new Error('Method not implemented.');
   }
 }

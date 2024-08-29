@@ -22,9 +22,10 @@ export class ArticlesService {
   ) {}
 
   // obtener todos los articulos
-  async findAll() {
+  async findAll(user: User) {
     const articles = await this.articleRepository
       .createQueryBuilder('article')
+      .where('article.status = :status', { status: ArticleStatus.PUBLISHED })
       .leftJoinAndSelect('article.author', 'author')
       .loadRelationCountAndMap('article.totalReactions', 'article.reactions')
       .select([
@@ -41,42 +42,40 @@ export class ArticlesService {
 
     const articleIds = articles.map((article) => article.id);
 
-    const topReactions = await this.reactionRepository
-      .createQueryBuilder('reaction')
-      .where('reaction.articleId IN (:...articleIds)', { articleIds })
-      .select([
-        'reaction.articleId',
-        'reaction.type',
-        'COUNT(reaction.id) as count',
-      ])
-      .groupBy('reaction.articleId, reaction.type')
-      .orderBy('count', 'DESC')
-      .addOrderBy('reaction.type')
-      .getRawMany();
+    if (articleIds.length === 0) {
+      return articles;
+    }
 
-    const reactionMap = new Map<string, any[]>();
-
-    topReactions.forEach((reaction) => {
-      if (!reactionMap.has(reaction.articleId)) {
-        reactionMap.set(reaction.articleId, []);
-      }
-
-      const reactions = reactionMap.get(reaction.articleId);
-      if (reactions.length < 3) {
-        reactions.push(reaction);
-      }
-    });
-
+    const reactionMap = await this.getTopReactionsForArticles(articleIds);
     articles.forEach((article) => {
       article.reactions = reactionMap.get(article.id) || [];
+    });
+
+    let myReactions = [];
+
+    // OBTENER REACCION DEL USUARIO AL ARTICULO (si existe)
+    if (user) {
+      myReactions = await this.getMyReactionsForArticles(articleIds, user.id);
+    }
+
+    articles.forEach((article) => {
+      const myReaction = myReactions.find(
+        (reaction) => reaction.articleId === article.id,
+      );
+      article.reactions.forEach((reaction) => {
+        console.log('reaction', reaction);
+        if (reaction.type === myReaction.type) {
+          reaction.isReacted = true;
+        }
+      });
     });
 
     return articles;
   }
 
   // obtener articulo por slug
-  async findOneBySlug(slug: string) {
-    return this.articleRepository
+  async findOneBySlug(slug: string, user: User) {
+    const article = await this.articleRepository
       .createQueryBuilder('article')
       .where('article.slug = :slug', { slug })
       .leftJoinAndSelect('article.author', 'author')
@@ -91,8 +90,35 @@ export class ArticlesService {
         'author.username',
         'author.email',
         'author.bio',
+        'author.profile_picture',
       ])
       .getOne();
+
+    if (!article) {
+      throw new Exceptions.NotFoundException('Article not found');
+    }
+
+    const reactionMap = await this.getTopReactionsForArticles([article.id], 0);
+
+    article.reactions = reactionMap.get(article.id) || [];
+
+    let myReactions = [];
+
+    // OBTENER REACCION DEL USUARIO AL ARTICULO (si existe)
+    if (user) {
+      myReactions = await this.getMyReactionsForArticles([article.id], user.id);
+    }
+
+    article.reactions.forEach((reaction) => {
+      const myReaction = myReactions.find(
+        (myReaction) => myReaction.articleId === article.id,
+      );
+      if (reaction.type === myReaction.type) {
+        reaction.isReacted = true;
+      }
+    });
+
+    return article;
   }
 
   // crear un articulo en borrador
@@ -200,5 +226,51 @@ export class ArticlesService {
     newArticle.author = user;
 
     return newArticle;
+  }
+
+  private getTopReactions(reactions: any[], limit: number = 3) {
+    const reactionMap = new Map<string, any[]>();
+
+    reactions.forEach((reaction) => {
+      if (!reactionMap.has(reaction.articleId)) {
+        reactionMap.set(reaction.articleId, []);
+      }
+
+      const reactions = reactionMap.get(reaction.articleId);
+      if (limit === 0 || reactions.length < limit) {
+        reactions.push(reaction);
+      }
+    });
+
+    return reactionMap;
+  }
+
+  private async getTopReactionsForArticles(articleIds: string[], limit = 3) {
+    const topReactions = await this.reactionRepository
+      .createQueryBuilder('reaction')
+      .where('reaction.articleId IN (:...articleIds)', { articleIds })
+      .select([
+        'reaction.articleId',
+        'reaction.type as type',
+        'COUNT(reaction.id) as count',
+      ])
+      .groupBy('reaction.articleId, reaction.type')
+      .orderBy('count', 'DESC')
+      .addOrderBy('reaction.type')
+      .getRawMany();
+
+    return this.getTopReactions(topReactions, limit);
+  }
+
+  private async getMyReactionsForArticles(
+    articleIds: string[],
+    userId: string,
+  ) {
+    return this.reactionRepository
+      .createQueryBuilder('reaction')
+      .where('reaction.articleId IN (:...articleIds)', { articleIds })
+      .andWhere('reaction.userId = :userId', { userId })
+      .select(['reaction.articleId', 'reaction.type as type'])
+      .getRawMany();
   }
 }

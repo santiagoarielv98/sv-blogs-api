@@ -32,4 +32,6 @@ export class Reaction {
 
   @ManyToOne(() => User, (user) => user.reactions, { nullable: false })
   user: User;
+
+  isReacted: boolean;
 }

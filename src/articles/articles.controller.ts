@@ -13,12 +13,18 @@ export class ArticlesController {
 
   @Get()
   async findAll() {
-    return this.articlesService.findAll();
+    const user = await this.usersService.findOneByUsername(
+      USERCREDENTIALS.username,
+    );
+    return this.articlesService.findAll(user);
   }
 
   @Get(':slug')
   async findOneBySlug(@Param('slug') slug: string) {
-    return this.articlesService.findOneBySlug(slug);
+    const user = await this.usersService.findOneByUsername(
+      USERCREDENTIALS.username,
+    );
+    return this.articlesService.findOneBySlug(slug, user);
   }
 
   @Post('draft')

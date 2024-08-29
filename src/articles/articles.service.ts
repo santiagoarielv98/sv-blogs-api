@@ -1,19 +1,21 @@
 import { Injectable } from '@nestjs/common';
+import * as Exceptions from '@nestjs/common/exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
+import { validateOrReject } from 'class-validator';
 import { ArticleStatus } from 'src/config/constants';
+import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { DraftArticleDto } from './dto/draft-article.dto';
-import { Article } from './entities/article.entity';
-import { User } from 'src/users/entities/user.entity';
 import { PublishArticleDto } from './dto/publish-article.dto';
-import * as Exceptions from '@nestjs/common/exceptions';
-import { validateOrReject } from 'class-validator';
+import { Article } from './entities/article.entity';
+import { SlugService } from './slug.service';
 
 @Injectable()
 export class ArticlesService {
   constructor(
     @InjectRepository(Article)
     private articleRepository: Repository<Article>,
+    private slugService: SlugService,
   ) {}
 
   // crear un articulo en borrador
@@ -42,12 +44,16 @@ export class ArticlesService {
     }
 
     try {
-      await validateOrReject(article, { skipMissingProperties: true });
+      await validateOrReject(this.toPublishArticleDto(article), {
+        skipMissingProperties: true,
+      });
     } catch (errors) {
       throw new Exceptions.BadRequestException(errors);
     }
 
+    article.slug = await this.slugService.generateUniqueSlug(article.title);
     article.status = ArticleStatus.PUBLISHED;
+
     return this.articleRepository.save(article);
   }
 
@@ -59,7 +65,18 @@ export class ArticlesService {
       ArticleStatus.PUBLISHED,
     );
 
+    newArticle.slug = await this.slugService.generateUniqueSlug(
+      newArticle.title,
+    );
+
     return this.articleRepository.save(newArticle);
+  }
+
+  public toPublishArticleDto(article: Article): PublishArticleDto {
+    const publishArticleDto = new PublishArticleDto();
+    publishArticleDto.title = article.title;
+    publishArticleDto.content = article.content;
+    return publishArticleDto;
   }
 
   private async createArticle(
@@ -74,5 +91,8 @@ export class ArticlesService {
     newArticle.author = user;
 
     return newArticle;
+  }
+  update(id: string, draftArticleDto: DraftArticleDto, user: User) {
+    throw new Error('Method not implemented.');
   }
 }

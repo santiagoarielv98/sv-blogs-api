@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Param, Post, Put } from '@nestjs/common';
 import { USERCREDENTIALS } from 'src/config/constants';
 import { UsersService } from 'src/users/users.service';
 import { ArticlesService } from './articles.service';
@@ -24,15 +24,26 @@ export class ArticlesController {
     const user = await this.usersService.findOneByUsername(
       USERCREDENTIALS.username,
     );
+    console.log(publishArticleDto);
     return this.articlesService.createAndPublish(publishArticleDto, user);
   }
 
-  // publicar un articulo ya creado
   @Post('publish/:id')
   async publish(@Param('id') id: string) {
     const user = await this.usersService.findOneByUsername(
       USERCREDENTIALS.username,
     );
     return this.articlesService.publish(id, user);
+  }
+
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() draftArticleDto: DraftArticleDto,
+  ) {
+    const user = await this.usersService.findOneByUsername(
+      USERCREDENTIALS.username,
+    );
+    return this.articlesService.update(id, draftArticleDto, user);
   }
 }

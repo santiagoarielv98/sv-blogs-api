@@ -1,12 +1,21 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsDefined,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+} from 'class-validator';
 
 export class PublishArticleDto {
   @IsOptional()
   @IsString()
   id: string;
 
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
+  @Length(1, 100)
+  @IsDefined()
   title: string;
 
   @IsNotEmpty()

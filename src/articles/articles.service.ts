@@ -30,7 +30,6 @@ export class ArticlesService {
       .select([
         'article.id',
         'article.title',
-        'article.content',
         'article.summary',
         'article.slug',
         'article.thumbnail',
@@ -71,8 +70,6 @@ export class ArticlesService {
     articles.forEach((article) => {
       article.reactions = reactionMap.get(article.id) || [];
     });
-
-    return articles;
 
     return articles;
   }

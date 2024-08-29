@@ -12,6 +12,7 @@ export default registerAs(
     database: process.env.DB_NAME,
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
     autoLoadEntities: true,
+    // logging: true,
     // synchronize: process.env.NODE_ENV !== 'production',
     // dropSchema: true,
   }),

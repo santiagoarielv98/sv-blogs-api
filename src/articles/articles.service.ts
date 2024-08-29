@@ -9,14 +9,94 @@ import { DraftArticleDto } from './dto/draft-article.dto';
 import { PublishArticleDto } from './dto/publish-article.dto';
 import { Article } from './entities/article.entity';
 import { SlugService } from './slug.service';
+import { Reaction } from 'src/reactions/entities/reaction.entity';
 
 @Injectable()
 export class ArticlesService {
   constructor(
     @InjectRepository(Article)
     private articleRepository: Repository<Article>,
+    @InjectRepository(Reaction)
+    private reactionRepository: Repository<Reaction>,
     private slugService: SlugService,
   ) {}
+
+  // obtener todos los articulos
+  async findAll() {
+    const articles = await this.articleRepository
+      .createQueryBuilder('article')
+      .leftJoinAndSelect('article.author', 'author')
+      .loadRelationCountAndMap('article.totalReactions', 'article.reactions')
+      .select([
+        'article.id',
+        'article.title',
+        'article.content',
+        'article.summary',
+        'article.slug',
+        'article.thumbnail',
+        'author.id',
+        'author.username',
+        'author.profile_picture',
+      ])
+      .getMany();
+
+    const articleIds = articles.map((article) => article.id);
+
+    const topReactions = await this.reactionRepository
+      .createQueryBuilder('reaction')
+      .where('reaction.articleId IN (:...articleIds)', { articleIds })
+      .select([
+        'reaction.articleId',
+        'reaction.type',
+        'COUNT(reaction.id) as count',
+      ])
+      .groupBy('reaction.articleId, reaction.type')
+      .orderBy('count', 'DESC')
+      .addOrderBy('reaction.type')
+      .getRawMany();
+
+    const reactionMap = new Map<string, any[]>();
+
+    topReactions.forEach((reaction) => {
+      if (!reactionMap.has(reaction.articleId)) {
+        reactionMap.set(reaction.articleId, []);
+      }
+
+      const reactions = reactionMap.get(reaction.articleId);
+      if (reactions.length < 3) {
+        reactions.push(reaction);
+      }
+    });
+
+    articles.forEach((article) => {
+      article.reactions = reactionMap.get(article.id) || [];
+    });
+
+    return articles;
+
+    return articles;
+  }
+
+  // obtener articulo por slug
+  async findOneBySlug(slug: string) {
+    return this.articleRepository
+      .createQueryBuilder('article')
+      .where('article.slug = :slug', { slug })
+      .leftJoinAndSelect('article.author', 'author')
+      .select([
+        'article.id',
+        'article.title',
+        'article.content',
+        'article.summary',
+        'article.slug',
+        'article.thumbnail',
+        'author.id',
+        'author.username',
+        'author.email',
+        'author.bio',
+      ])
+      .getOne();
+  }
 
   // crear un articulo en borrador
   async draft(draftArticleDto: DraftArticleDto, user: User) {

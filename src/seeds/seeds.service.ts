@@ -44,6 +44,7 @@ export class SeedsService implements OnApplicationBootstrap {
 
   async seeds() {
     if ((await this.userRepository.count()) > 0) return;
+    console.log('Creating seeds');
     // clear all data
     await this.commentReactionRepository.delete({});
     await this.commentRepository.delete({});
@@ -66,6 +67,7 @@ export class SeedsService implements OnApplicationBootstrap {
       ARTICLE_MOCK_DATA.map((article) => ({
         ...article,
         published: true,
+        status: ArticleStatus.PUBLISHED,
         author: users[Math.floor(Math.random() * users.length)],
       })),
     );
@@ -74,7 +76,6 @@ export class SeedsService implements OnApplicationBootstrap {
     const _articleTags = await this.articleTagRepository.save(
       articles.map((article) => ({
         article,
-        status: ArticleStatus.PUBLISHED,
         tag: tags[Math.floor(Math.random() * tags.length)],
       })),
     );
@@ -129,16 +130,40 @@ export class SeedsService implements OnApplicationBootstrap {
     );
     console.log('Created replies reactions');
 
-    const _reactions = await this.reactionRepository.save(
-      articles.map((article) => ({
-        user: users[Math.floor(Math.random() * users.length)],
-        article,
-        type: CommentReactionType.LIKE,
-      })),
+    // const _reactions = await this.reactionRepository.save(
+    //   articles.map((article) => ({
+    //     user: users[Math.floor(Math.random() * users.length)],
+    //     article,
+    //     type: CommentReactionType.LIKE,
+    //   })),
+    // );
+
+    await Promise.all(
+      articles.map((article) =>
+        users.map(async (user) => {
+          return await this.reactionRepository.save({
+            user,
+            article,
+            type: getRandomEnumValue(CommentReactionType),
+          });
+        }),
+      ),
     );
 
     console.log('Created reactions');
 
     console.log('Seeds created');
   }
+}
+function getRandomEnumValue<T>(anEnum: T): T[keyof T] {
+  //save enums inside array
+  const enumValues = Object.keys(anEnum) as Array<keyof T>;
+
+  //Generate a random index (max is array length)
+  const randomIndex = Math.floor(Math.random() * enumValues.length);
+  // get the random enum value
+
+  const randomEnumKey = enumValues[randomIndex];
+  return anEnum[randomEnumKey];
+  // if you want to have the key than return randomEnumKey
 }

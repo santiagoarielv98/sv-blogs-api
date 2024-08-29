@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { USERCREDENTIALS } from 'src/config/constants';
 import { UsersService } from 'src/users/users.service';
 import { ArticlesService } from './articles.service';
@@ -10,6 +10,16 @@ export class ArticlesController {
     private readonly articlesService: ArticlesService,
     private readonly usersService: UsersService,
   ) {}
+
+  @Get()
+  async findAll() {
+    return this.articlesService.findAll();
+  }
+
+  @Get(':slug')
+  async findOneBySlug(@Param('slug') slug: string) {
+    return this.articlesService.findOneBySlug(slug);
+  }
 
   @Post('draft')
   async draft(@Body() draftArticleDto: DraftArticleDto) {

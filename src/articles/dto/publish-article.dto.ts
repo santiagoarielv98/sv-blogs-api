@@ -8,10 +8,6 @@ import {
 } from 'class-validator';
 
 export class PublishArticleDto {
-  @IsOptional()
-  @IsString()
-  id: string;
-
   @IsString()
   @IsNotEmpty()
   @Length(1, 100)

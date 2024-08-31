@@ -9,20 +9,17 @@ import { DraftArticleDto } from './dto/draft-article.dto';
 import { PublishArticleDto } from './dto/publish-article.dto';
 import { Article } from './entities/article.entity';
 import { SlugService } from './slug.service';
-import { Reaction } from 'src/reactions/entities/reaction.entity';
 
 @Injectable()
 export class ArticlesService {
   constructor(
     @InjectRepository(Article)
     private articleRepository: Repository<Article>,
-    @InjectRepository(Reaction)
-    private reactionRepository: Repository<Reaction>,
     private slugService: SlugService,
   ) {}
 
   // obtener todos los articulos
-  async findAll(user: User) {
+  async findAll() {
     const articles = await this.articleRepository
       .createQueryBuilder('article')
       .where('article.status = :status', { status: ArticleStatus.PUBLISHED })
@@ -40,41 +37,11 @@ export class ArticlesService {
       ])
       .getMany();
 
-    const articleIds = articles.map((article) => article.id);
-
-    if (articleIds.length === 0) {
-      return articles;
-    }
-
-    const reactionMap = await this.getTopReactionsForArticles(articleIds);
-    articles.forEach((article) => {
-      article.reactions = reactionMap.get(article.id) || [];
-    });
-
-    let myReactions = [];
-
-    // OBTENER REACCION DEL USUARIO AL ARTICULO (si existe)
-    if (user) {
-      myReactions = await this.getMyReactionsForArticles(articleIds, user.id);
-    }
-
-    articles.forEach((article) => {
-      const myReaction = myReactions.find(
-        (reaction) => reaction.articleId === article.id,
-      );
-      article.reactions.forEach((reaction) => {
-        console.log('reaction', reaction);
-        if (reaction.type === myReaction.type) {
-          reaction.isReacted = true;
-        }
-      });
-    });
-
     return articles;
   }
 
   // obtener articulo por slug
-  async findOneBySlug(slug: string, user: User) {
+  async findOneBySlug(slug: string) {
     const article = await this.articleRepository
       .createQueryBuilder('article')
       .where('article.slug = :slug', { slug })
@@ -98,37 +65,12 @@ export class ArticlesService {
       throw new Exceptions.NotFoundException('Article not found');
     }
 
-    const reactionMap = await this.getTopReactionsForArticles([article.id], 0);
-
-    article.reactions = reactionMap.get(article.id) || [];
-
-    let myReactions = [];
-
-    // OBTENER REACCION DEL USUARIO AL ARTICULO (si existe)
-    if (user) {
-      myReactions = await this.getMyReactionsForArticles([article.id], user.id);
-    }
-
-    article.reactions.forEach((reaction) => {
-      const myReaction = myReactions.find(
-        (myReaction) => myReaction.articleId === article.id,
-      );
-      if (reaction.type === myReaction.type) {
-        reaction.isReacted = true;
-      }
-    });
-
     return article;
   }
 
   // crear un articulo en borrador
-  async draft(draftArticleDto: DraftArticleDto, user: User) {
-    const newArticle = await this.createArticle(
-      draftArticleDto,
-      user,
-      ArticleStatus.DRAFT,
-    );
-
+  async draft(draftArticleDto: DraftArticleDto) {
+    const newArticle = this.articleRepository.create(draftArticleDto);
     return this.articleRepository.save(newArticle);
   }
 
@@ -158,21 +100,6 @@ export class ArticlesService {
     article.status = ArticleStatus.PUBLISHED;
 
     return this.articleRepository.save(article);
-  }
-
-  // crear un articulo y publicarlo
-  async createAndPublish(publishArticleDto: PublishArticleDto, user: User) {
-    const newArticle = await this.createArticle(
-      publishArticleDto,
-      user,
-      ArticleStatus.PUBLISHED,
-    );
-
-    newArticle.slug = await this.slugService.generateUniqueSlug(
-      newArticle.title,
-    );
-
-    return this.articleRepository.save(newArticle);
   }
 
   // TODO: implementar la actualización de un articulo
@@ -212,65 +139,5 @@ export class ArticlesService {
     publishArticleDto.title = article.title;
     publishArticleDto.content = article.content;
     return publishArticleDto;
-  }
-
-  private async createArticle(
-    dto: DraftArticleDto | PublishArticleDto,
-    user: User,
-    status: ArticleStatus,
-  ) {
-    const newArticle = this.articleRepository.create();
-    newArticle.title = dto.title;
-    newArticle.content = dto.content;
-    newArticle.status = status;
-    newArticle.author = user;
-
-    return newArticle;
-  }
-
-  private getTopReactions(reactions: any[], limit: number = 3) {
-    const reactionMap = new Map<string, any[]>();
-
-    reactions.forEach((reaction) => {
-      if (!reactionMap.has(reaction.articleId)) {
-        reactionMap.set(reaction.articleId, []);
-      }
-
-      const reactions = reactionMap.get(reaction.articleId);
-      if (limit === 0 || reactions.length < limit) {
-        reactions.push(reaction);
-      }
-    });
-
-    return reactionMap;
-  }
-
-  private async getTopReactionsForArticles(articleIds: string[], limit = 3) {
-    const topReactions = await this.reactionRepository
-      .createQueryBuilder('reaction')
-      .where('reaction.articleId IN (:...articleIds)', { articleIds })
-      .select([
-        'reaction.articleId',
-        'reaction.type as type',
-        'COUNT(reaction.id) as count',
-      ])
-      .groupBy('reaction.articleId, reaction.type')
-      .orderBy('count', 'DESC')
-      .addOrderBy('reaction.type')
-      .getRawMany();
-
-    return this.getTopReactions(topReactions, limit);
-  }
-
-  private async getMyReactionsForArticles(
-    articleIds: string[],
-    userId: string,
-  ) {
-    return this.reactionRepository
-      .createQueryBuilder('reaction')
-      .where('reaction.articleId IN (:...articleIds)', { articleIds })
-      .andWhere('reaction.userId = :userId', { userId })
-      .select(['reaction.articleId', 'reaction.type as type'])
-      .getRawMany();
   }
 }

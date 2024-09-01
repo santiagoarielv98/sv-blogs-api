@@ -1,16 +1,18 @@
-import { ArticleTag } from 'src/article-tags/entities/article-tag.entity';
 import { Comment } from 'src/comments/entities/comment.entity';
 import { ArticleStatus } from 'src/config/constants';
 import { Reaction } from 'src/reactions/entities/reaction.entity';
+import { Tag } from 'src/tags/entities/tag.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
@@ -53,6 +55,9 @@ export class Article {
   @OneToMany(() => Reaction, (reaction) => reaction.article)
   reactions: Reaction[];
 
-  @OneToMany(() => ArticleTag, (article_tag) => article_tag.article)
-  tags: ArticleTag[];
+  // @OneToMany(() => ArticleTag, (article_tag) => article_tag.article)
+  // tags: ArticleTag[];
+  @ManyToMany(() => Tag)
+  @JoinTable()
+  tags: Tag[];
 }

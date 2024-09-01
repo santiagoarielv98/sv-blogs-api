@@ -19,7 +19,11 @@ export class ArticlesService {
       .createQueryBuilder('article')
       .where('article.status = :status', { status: ArticleStatus.PUBLISHED })
       .leftJoinAndSelect('article.author', 'author')
+      .leftJoinAndSelect('article.tags', 'tags')
+      .leftJoinAndSelect('article.reactions', 'reactions')
+      .leftJoinAndSelect('reactions.user', 'reaction_user')
       .loadRelationCountAndMap('article.totalReactions', 'article.reactions')
+      .loadRelationCountAndMap('article.totalComments', 'article.comments')
       .select([
         'article.id',
         'article.title',
@@ -29,6 +33,7 @@ export class ArticlesService {
         'author.id',
         'author.username',
         'author.profile_picture',
+        'tags',
       ])
       .getMany();
 

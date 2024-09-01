@@ -2,26 +2,23 @@ import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { ArticleTag } from 'src/article-tags/entities/article-tag.entity';
 import { Article } from 'src/articles/entities/article.entity';
 import { CommentReaction } from 'src/comment-reactions/entities/comment-reaction.entity';
 import { Comment } from 'src/comments/entities/comment.entity';
+import { ArticleStatus, CommentReactionType } from 'src/config/constants';
 import { Follower } from 'src/followers/entities/follower.entity';
 import { Reaction } from 'src/reactions/entities/reaction.entity';
+import { Tag } from 'src/tags/entities/tag.entity';
 import { User } from 'src/users/entities/user.entity';
-import * as USER_MOCK_DATA from './mocks/USER_MOCK_DATA.json';
-import * as TAG_MOCK_DATA from './mocks/TAG_MOCK_DATA.json';
 import * as ARTICLE_MOCK_DATA from './mocks/ARTICLE_MOCK_DATA.json';
 import * as COMMENT_MOCK_DATA from './mocks/COMMENT_MOCK_DATA.json';
 import * as REPLIES_MOCK_DATA from './mocks/REPLIES_MOCK_DATA.json';
-import { Tag } from 'src/tags/entities/tag.entity';
-import { ArticleStatus, CommentReactionType } from 'src/config/constants';
+import * as TAG_MOCK_DATA from './mocks/TAG_MOCK_DATA.json';
+import * as USER_MOCK_DATA from './mocks/USER_MOCK_DATA.json';
 
 @Injectable()
 export class SeedsService implements OnApplicationBootstrap {
   constructor(
-    @InjectRepository(ArticleTag)
-    private articleTagRepository: Repository<ArticleTag>,
     @InjectRepository(Article)
     private articleRepository: Repository<Article>,
     @InjectRepository(CommentReaction)
@@ -48,7 +45,6 @@ export class SeedsService implements OnApplicationBootstrap {
     // clear all data
     await this.commentReactionRepository.delete({});
     await this.commentRepository.delete({});
-    await this.articleTagRepository.delete({});
     await this.articleRepository.delete({});
     await this.followerRepository.delete({});
     await this.reactionRepository.delete({});
@@ -72,14 +68,20 @@ export class SeedsService implements OnApplicationBootstrap {
       })),
     );
     console.log('Created articles');
+    articles.forEach((article) => {
+      article.tags = tags.slice(0, 3);
+    });
 
-    const _articleTags = await this.articleTagRepository.save(
-      articles.map((article) => ({
-        article,
-        tag: tags[Math.floor(Math.random() * tags.length)],
-      })),
-    );
+    await this.articleRepository.save(articles);
     console.log('Created article tags');
+
+    // const _articleTags = await this.articleTagRepository.save(
+    //   articles.map((article) => ({
+    //     article,
+    //     tag: tags[Math.floor(Math.random() * tags.length)],
+    //   })),
+    // );
+    // console.log('Created article tags');
 
     const _followers = await this.followerRepository.save(
       users.map((user) => ({

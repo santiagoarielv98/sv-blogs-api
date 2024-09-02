@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { Article } from 'src/articles/entities/article.entity';
 import { CommentReaction } from 'src/comment-reactions/entities/comment-reaction.entity';
 import { Comment } from 'src/comments/entities/comment.entity';
-import { ArticleStatus, CommentReactionType } from 'src/config/constants';
+import { ArticleStatus, ReactionType } from 'src/config/constants';
 import { Follower } from 'src/followers/entities/follower.entity';
 import { Reaction } from 'src/reactions/entities/reaction.entity';
 import { Tag } from 'src/tags/entities/tag.entity';
@@ -118,7 +118,6 @@ export class SeedsService implements OnApplicationBootstrap {
       comments.map((comment) => ({
         user: users[Math.floor(Math.random() * users.length)],
         comment,
-        type: CommentReactionType.LIKE,
       })),
     );
     console.log('Created comment reactions');
@@ -127,7 +126,7 @@ export class SeedsService implements OnApplicationBootstrap {
       replies.map((reply) => ({
         user: users[Math.floor(Math.random() * users.length)],
         comment: reply,
-        type: CommentReactionType.LIKE,
+        type: ReactionType.LIKE,
       })),
     );
     console.log('Created replies reactions');
@@ -146,7 +145,7 @@ export class SeedsService implements OnApplicationBootstrap {
           return await this.reactionRepository.save({
             user,
             article,
-            type: getRandomEnumValue(CommentReactionType),
+            type: getRandomEnumValue(ReactionType),
           });
         }),
       ),

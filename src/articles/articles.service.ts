@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as Exceptions from '@nestjs/common/exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Reaction } from 'src/reactions/entities/reaction.entity';
 import { ReactionsService } from 'src/reactions/reactions.service';
 import { Repository } from 'typeorm';
 import { DraftArticleDto } from './dto/draft-article.dto';
@@ -13,8 +12,6 @@ export class ArticlesService {
     @InjectRepository(Article)
     private articleRepository: Repository<Article>,
     private reactionService: ReactionsService,
-    @InjectRepository(Reaction)
-    private reactionRepository: Repository<Reaction>,
   ) {}
 
   async findAll2() {

@@ -1,6 +1,6 @@
 export const DATABASE_CONFIG = 'database';
 
-export enum CommentReactionType {
+export enum ReactionType {
   LIKE = 'like',
   DISLIKE = 'dislike',
   LOVE = 'love',

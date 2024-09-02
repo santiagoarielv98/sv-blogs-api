@@ -1,5 +1,5 @@
 import { Article } from 'src/articles/entities/article.entity';
-import { CommentReactionType } from 'src/config/constants';
+import { ReactionType } from 'src/config/constants';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -18,9 +18,9 @@ export class Reaction {
 
   @Column({
     type: 'enum',
-    enum: CommentReactionType,
+    enum: ReactionType,
   })
-  type: CommentReactionType;
+  type: ReactionType;
 
   @CreateDateColumn()
   created_at: Date;

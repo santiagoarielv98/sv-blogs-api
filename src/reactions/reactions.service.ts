@@ -44,4 +44,15 @@ export class ReactionsService {
       .orderBy('reaction.articleId, COUNT(reaction.id)', 'DESC')
       .getRawMany();
   }
+
+  async getReactionsByArticleId(articleId: string) {
+    return await this.reactionRepository
+      .createQueryBuilder('reaction')
+      .select('reaction.type', 'type')
+      .addSelect('COUNT(reaction.id)', 'count')
+      .where('reaction.articleId = :articleId', { articleId })
+      .groupBy('reaction.type')
+      .orderBy('COUNT(reaction.id)', 'DESC')
+      .getRawMany();
+  }
 }

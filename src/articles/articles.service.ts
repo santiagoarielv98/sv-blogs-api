@@ -88,6 +88,18 @@ export class ArticlesService {
       throw new Exceptions.NotFoundException('Article not found');
     }
 
+    const [comments, reactions] = await Promise.all([
+      this.commentService.getCommentsByArticleId(article.id),
+      this.reactionService.getReactionsByArticleId(article.id),
+    ]);
+
+    article.reactions = reactions.map((reaction) => ({
+      type: reaction.type,
+      count: parseInt(reaction.count),
+    })) as any[];
+
+    article.comments = comments;
+
     return article;
   }
 

@@ -4,10 +4,10 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 export default registerAs(
   'database',
   (): TypeOrmModuleOptions => ({
+    autoLoadEntities: true,
     type: 'postgres',
     ...((process.env.NODE_ENV === 'production' && {
-      ssl: { rejectUnauthorized: false },
-      url: process.env.DB_URL,
+      url: process.env.DB_POSTGRES_URL,
     }) || {
       host: process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT, 10),
@@ -15,9 +15,8 @@ export default registerAs(
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
     }),
-    autoLoadEntities: true,
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-    // logging: true,
+    logging: true,
     // synchronize: process.env.NODE_ENV !== 'production',
     // dropSchema: true,
   }),

@@ -1,5 +1,4 @@
-import { ArticleTag } from 'src/article-tags/entities/article-tag.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Tag {
@@ -8,9 +7,4 @@ export class Tag {
 
   @Column({ unique: true, nullable: false })
   name: string;
-
-  // Relaciones
-
-  @OneToMany(() => ArticleTag, (article_tag) => article_tag.tag)
-  articles: ArticleTag[];
 }

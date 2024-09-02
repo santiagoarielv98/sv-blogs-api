@@ -33,19 +33,15 @@ export class ReactionsService {
   }
 
   // obtener las reacciones de varios articulos
-  async getReactionsByArticles(articlesIds: string[]) {
+  async getReactionsByArticlesIds(articlesIds: string[]) {
     return await this.reactionRepository
       .createQueryBuilder('reaction')
+      .select('reaction.articleId', 'articleId')
+      .addSelect('reaction.type', 'type')
+      .addSelect('COUNT(reaction.id)', 'count')
       .where('reaction.articleId IN (:...articlesIds)', { articlesIds })
-      .leftJoinAndSelect('reaction.user', 'user')
-      .select([
-        'reaction.id',
-        'reaction.type',
-        'reaction.articleId',
-        'user.id',
-        'user.username',
-        'user.profile_picture',
-      ])
-      .getMany();
+      .groupBy('reaction.articleId, reaction.type')
+      .orderBy('reaction.articleId, COUNT(reaction.id)', 'DESC')
+      .getRawMany();
   }
 }

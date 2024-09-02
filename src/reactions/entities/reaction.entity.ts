@@ -35,4 +35,5 @@ export class Reaction {
 
   isReacted: boolean;
   articleId: string;
+  count: number;
 }

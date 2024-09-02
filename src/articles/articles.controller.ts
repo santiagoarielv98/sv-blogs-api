@@ -8,7 +8,7 @@ export class ArticlesController {
   @Get()
   async findAll() {
     // return this.articlesService.findAll();
-    return this.articlesService.getPostsWithTopReactions();
+    return this.articlesService.findAll2();
   }
 
   @Get(':slug')

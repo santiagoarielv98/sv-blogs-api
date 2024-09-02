@@ -1,13 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import * as Exceptions from '@nestjs/common/exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ArticleStatus } from 'src/config/constants';
+import { Reaction } from 'src/reactions/entities/reaction.entity';
+import { ReactionsService } from 'src/reactions/reactions.service';
 import { Repository } from 'typeorm';
 import { DraftArticleDto } from './dto/draft-article.dto';
 import { Article } from './entities/article.entity';
-import { ReactionsService } from 'src/reactions/reactions.service';
-import { Reaction } from 'src/reactions/entities/reaction.entity';
-import { Comment } from 'src/comments/entities/comment.entity';
 
 @Injectable()
 export class ArticlesService {
@@ -15,81 +13,52 @@ export class ArticlesService {
     @InjectRepository(Article)
     private articleRepository: Repository<Article>,
     private reactionService: ReactionsService,
+    @InjectRepository(Reaction)
+    private reactionRepository: Repository<Reaction>,
   ) {}
 
-  async getPostsWithTopReactions() {
-    const articles = await this.articleRepository
+  async findAll2() {
+    const articles: any[] = await this.articleRepository
       .createQueryBuilder('article')
-      .where('article.status = :status', { status: ArticleStatus.PUBLISHED })
       .leftJoinAndSelect('article.author', 'author')
       .leftJoinAndSelect('article.tags', 'tags')
-      .addSelect(
-        (qb) =>
-          qb
-            .select('COUNT(comment.id)', 'totalComments')
-            .from(Comment, 'comment')
-            .where('comment.articleId = article.id'),
-        'article_totalComments',
-      )
-      .leftJoinAndSelect(
-        (qb) =>
-          qb
-            .select('reaction.articleId', 'articleId')
-            .addSelect('reaction.type', 'type')
-            .addSelect('COUNT(reaction.id)', 'count')
-            .from(Reaction, 'reaction')
-            .groupBy('reaction.articleId, reaction.type')
-            .orderBy('reaction.articleId, COUNT(reaction.id)', 'DESC'),
-        'reactions',
-        '"reactions"."articleId" = "article"."id"',
-      )
-      .getRawMany();
+      .loadRelationCountAndMap('article.totalComments', 'article.comments')
+      .getMany();
 
-    const groupedArticles = articles.reduce((acc, article) => {
-      if (!acc[article.article_id]) {
-        acc[article.article_id] = {
-          id: article.article_id,
-          title: article.article_title,
-          summary: article.article_summary,
-          slug: article.article_slug,
-          thumbnail: article.article_thumbnail,
-          totalComments: article.article_totalComments,
-          author: {
-            id: article.author_id,
-            username: article.author_username,
-            profile_picture: article.author_profile_picture,
-          },
-          reactions: {},
-          tags: {},
-        };
+    const articlesIds = articles.map((article) => article.id);
+
+    const reactions =
+      await this.reactionService.getReactionsByArticlesIds(articlesIds);
+
+    const groupedReactions = reactions.reduce((acc, reaction) => {
+      if (!acc[reaction.articleId]) {
+        acc[reaction.articleId] = {};
       }
 
-      acc[article.article_id].reactions[article.type] = article.count;
-
-      acc[article.article_id].tags[article.tags_id] = article.tags_name;
+      acc[reaction.articleId][reaction.type] = reaction.count;
 
       return acc;
     }, {});
 
-    const articlesArray: any[] = Object.values(groupedArticles);
-
-    articlesArray.forEach((article) => {
-      const reactions = Object.entries(article.reactions).map(
+    articles.forEach((article) => {
+      const articleReactions = groupedReactions[article.id] || {};
+      const reactions = Object.entries(articleReactions).map(
         ([type, count]) => ({
           type,
-          count,
+          count: parseInt(count as string),
         }),
       );
       article.reactions = reactions;
 
-      const tags = Object.entries(article.tags).map(([id, name]) => ({
-        id,
-        name,
-      }));
-      article.tags = tags;
+      const totalReactions = reactions.reduce(
+        (acc, reaction) => acc + reaction.count,
+        0,
+      );
+
+      article.totalReactions = totalReactions;
     });
 
-    return articlesArray;
+    return articles;
   }
 
   // obtener articulo por slug
@@ -98,6 +67,7 @@ export class ArticlesService {
       .createQueryBuilder('article')
       .where('article.slug = :slug', { slug })
       .leftJoinAndSelect('article.author', 'author')
+      .leftJoinAndSelect('article.tags', 'tags')
       .select([
         'article.id',
         'article.title',
@@ -110,6 +80,8 @@ export class ArticlesService {
         'author.email',
         'author.bio',
         'author.profile_picture',
+        'tags.id',
+        'tags.name',
       ])
       .getOne();
 

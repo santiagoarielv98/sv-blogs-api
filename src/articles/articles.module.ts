@@ -5,10 +5,11 @@ import { ArticlesController } from './articles.controller';
 import { ArticlesService } from './articles.service';
 import { Article } from './entities/article.entity';
 import { SlugService } from './slug.service';
+import { ReactionsService } from 'src/reactions/reactions.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Article, Reaction])],
   controllers: [ArticlesController],
-  providers: [ArticlesService, SlugService],
+  providers: [ArticlesService, SlugService, ReactionsService],
 })
 export class ArticlesModule {}

@@ -69,7 +69,7 @@ export class SeedsService implements OnApplicationBootstrap {
     );
     console.log('Created articles');
     articles.forEach((article) => {
-      article.tags = tags.slice(0, 3);
+      article.tags = tags;
     });
 
     await this.articleRepository.save(articles);

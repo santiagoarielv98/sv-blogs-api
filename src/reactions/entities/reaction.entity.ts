@@ -34,4 +34,5 @@ export class Reaction {
   user: User;
 
   isReacted: boolean;
+  articleId: string;
 }

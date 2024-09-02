@@ -55,8 +55,6 @@ export class Article {
   @OneToMany(() => Reaction, (reaction) => reaction.article)
   reactions: Reaction[];
 
-  // @OneToMany(() => ArticleTag, (article_tag) => article_tag.article)
-  // tags: ArticleTag[];
   @ManyToMany(() => Tag)
   @JoinTable()
   tags: Tag[];

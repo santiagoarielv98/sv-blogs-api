@@ -16,6 +16,7 @@ import * as REPLIES_MOCK_DATA from './mocks/REPLIES_MOCK_DATA.json';
 import * as TAG_MOCK_DATA from './mocks/TAG_MOCK_DATA.json';
 import * as USER_MOCK_DATA from './mocks/USER_MOCK_DATA.json';
 
+const baseUrl = 'https://picsum.photos/id/{id}/300/200';
 @Injectable()
 export class SeedsService implements OnApplicationBootstrap {
   constructor(
@@ -52,12 +53,19 @@ export class SeedsService implements OnApplicationBootstrap {
     await this.tagRepository.delete({});
     console.log('Deleted all data');
 
-    const users = await this.userRepository.save(USER_MOCK_DATA);
+    const users = await this.userRepository.save(
+      USER_MOCK_DATA.map((user) => ({
+        ...user,
+        profile_picture: baseUrl.replace(
+          '{id}',
+          Math.floor(Math.random() * 1000).toString(),
+        ),
+      })),
+    );
 
     const tags = await this.tagRepository.save(
       TAG_MOCK_DATA.map((tag) => ({ name: tag })),
     );
-    console.log('Created tags');
 
     const articles = await this.articleRepository.save(
       ARTICLE_MOCK_DATA.map((article) => ({
@@ -65,11 +73,20 @@ export class SeedsService implements OnApplicationBootstrap {
         published: true,
         status: ArticleStatus.PUBLISHED,
         author: users[Math.floor(Math.random() * users.length)],
+        thumbnail: baseUrl.replace(
+          '{id}',
+          Math.floor(Math.random() * 1000).toString(),
+        ),
       })),
     );
     console.log('Created articles');
     articles.forEach((article) => {
-      article.tags = tags;
+      // article.tags = tags;
+      // seleccionar 4 tags aleatorios
+      article.tags = tags
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 4)
+        .map((tag) => tag);
     });
 
     await this.articleRepository.save(articles);

@@ -12,7 +12,7 @@ export class ArticlesController {
   @Get()
   async findAll() {
     // return this.articlesService.findAll();
-    return this.articlesService.findAll2();
+    return this.articlesService.findAll();
   }
 
   @Get(':slug')

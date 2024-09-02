@@ -5,6 +5,7 @@ import { ReactionsService } from 'src/reactions/reactions.service';
 import { Repository } from 'typeorm';
 import { DraftArticleDto } from './dto/draft-article.dto';
 import { Article } from './entities/article.entity';
+import { CommentsService } from 'src/comments/comments.service';
 
 @Injectable()
 export class ArticlesService {
@@ -12,9 +13,10 @@ export class ArticlesService {
     @InjectRepository(Article)
     private articleRepository: Repository<Article>,
     private reactionService: ReactionsService,
+    private commentService: CommentsService,
   ) {}
 
-  async findAll2() {
+  async findAll() {
     const articles: any[] = await this.articleRepository
       .createQueryBuilder('article')
       .leftJoinAndSelect('article.author', 'author')
